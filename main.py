@@ -1,10 +1,12 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.api.v1.api import api_router
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.rate_limit import limiter, _rate_limit_exceeded_handler
+import os
 
 # Ensure all models are imported and initialized so SQLAlchemy can map relationships
 import app.models  # noqa
@@ -35,9 +37,14 @@ app.add_middleware(SlowAPIMiddleware)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
+# Serve uploaded files as static assets
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 @app.get("/")
 def root() -> dict[str, str]:
     """
     Root endpoint for the Task Manager API
     """
     return {"message": f"Welcome to {settings.PROJECT_NAME}"}
+
