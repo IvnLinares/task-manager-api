@@ -19,3 +19,7 @@ task_manager.db
 
 # uv
 uv.lock
+
+# Uploads
+uploads/
+.pytest_cache/
